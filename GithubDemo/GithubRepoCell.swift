@@ -20,7 +20,19 @@ class GithubRepoCell: UITableViewCell {
     @IBOutlet weak var starImageView: UIImageView!
     @IBOutlet weak var linkImageView: UIImageView!
     
-    
+    var repo: GithubRepo! {
+        didSet {
+            repoNameLable.text = repo.name!
+            repoImageView.setImageWith(URL(string: repo.ownerAvatarURL!)!)
+            starNumLable.text = "\(repo.stars!)"
+            linkNumLable.text = "\(repo.forks!)"
+            descriptionLable.text = "\(repo.repoDescription!)"
+            authorLable.text = "\(repo.ownerHandle!)"
+            linkImageView.image = UIImage(named: "fork")
+            starImageView.image = UIImage(named: "star")
+        }
+    }
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

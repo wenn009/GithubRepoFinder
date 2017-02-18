@@ -8,6 +8,7 @@
 
 import UIKit
 import MBProgressHUD
+import AFNetworking
 
 // Main ViewController
 class RepoResultsViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
@@ -25,6 +26,8 @@ class RepoResultsViewController: UIViewController,UITableViewDataSource, UITable
         
         repoTableView.dataSource = self
         repoTableView.delegate = self
+        repoTableView.rowHeight = UITableViewAutomaticDimension
+        repoTableView.estimatedRowHeight = 200
         
         // Initialize the UISearchBar
         searchBar = UISearchBar()
@@ -36,6 +39,19 @@ class RepoResultsViewController: UIViewController,UITableViewDataSource, UITable
 
         // Perform the first search when the view controller first loads
         doSearch()
+        
+        if let repos = repos {
+            for repo in repos {
+                print(repo.name!)
+                print(repo.ownerHandle!)
+                print(repo.forks!)
+                print(repo.stars!)
+                print(repo.ownerAvatarURL!)
+                print(repo.repoDescription!)
+            }
+        }
+        
+        self.repoTableView.reloadData()
     }
 
     // Perform the search.
@@ -51,6 +67,7 @@ class RepoResultsViewController: UIViewController,UITableViewDataSource, UITable
                 print(repo)
             }
             self.repos = newRepos
+            self.repoTableView.reloadData()
             MBProgressHUD.hide(for: self.view, animated: true)
             }, error: { (error) -> Void in
                 print(error)
@@ -59,42 +76,20 @@ class RepoResultsViewController: UIViewController,UITableViewDataSource, UITable
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
-        /*if let repos = repos {
+        if let repos = repos {
             return repos.count
         }
         else {
             return 0;
-        }*/
-        return 5;
+        }
 
     }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{
-        let cell = repoTableView.dequeueReusableCell(withIdentifier: "GithubRepoCell") as! GithubRepoCell
-        
-        let repo = repos![indexPath.row]
-        
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = repoTableView.dequeueReusableCell(withIdentifier: "GithubRepoCell", for: indexPath) as! GithubRepoCell
 
-        if let imageUrl = URL(string: repo.ownerAvatarURL!) {
-                cell.repoImageView.setImageWith(imageUrl)
-            } else {
-                // URL(string: imageUrlString!) is nil. Good thing we didn't try to unwrap it!
-            }
-        cell.authorLable.text = repo.ownerHandle
-        cell.descriptionLable.text = repo.repoDescription
-        cell.repoNameLable.text = repo.name
-        let stars = "\(repo.stars)" as String
-        let forks = "\(repo.forks)" as String
-        
-        cell.starNumLable.text = stars
-        cell.linkNumLable.text = forks
-        
-        cell.linkImageView.image = UIImage(named: "star")
-        cell.starImageView.image = UIImage(named: "fork")
-            
-
+        cell.repo = repos[indexPath.row]
         
         return cell;
-        
     }
 }
 
